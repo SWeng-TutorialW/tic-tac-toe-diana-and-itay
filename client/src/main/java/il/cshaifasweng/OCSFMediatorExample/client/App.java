@@ -25,11 +25,14 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
     	EventBus.getDefault().register(this);
-    	client = SimpleClient.getClient();
-    	client.openConnection();
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        stage.setTitle("Tic Tac Toe");
+        scene = new Scene(loadFXML("primary"), 450, 380);
         stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setTitle("Tic Tac Toe!");
         stage.show();
+
+
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -41,13 +44,15 @@ public class App extends Application {
         return fxmlLoader.load();
     }
     
-    
+    void setClient(SimpleClient client) {
+    	this.client = client;
+    }
 
     @Override
 	public void stop() throws Exception {
 		// TODO Auto-generated method stub
     	EventBus.getDefault().unregister(this);
-        client.sendToServer("remove client");
+        client.sendToServer("#removeClient");
         client.closeConnection();
 		super.stop();
 	}
