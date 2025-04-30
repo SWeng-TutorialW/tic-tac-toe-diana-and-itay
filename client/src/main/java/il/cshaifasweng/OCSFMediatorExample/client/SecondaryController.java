@@ -83,9 +83,18 @@ public class SecondaryController {
             if (winner.equals("#winner X")) {
                 playLbl.setText("Player X wins!");
                 playLbl.setFont(Font.font("System", 22));
+                try{SimpleClient.getClient().closeConnection();}
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             } else if (winner.equals("#winner O")) {
                 playLbl.setText("Player O wins!");
                 playLbl.setFont(Font.font("System", 22));
+                try{SimpleClient.getClient().closeConnection();}
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else if(winner.equals("[GAME INFO] DRAW!")) {
                 playLbl.setText("It's a draw!");
                 playLbl.setFont(Font.font("System", 22));

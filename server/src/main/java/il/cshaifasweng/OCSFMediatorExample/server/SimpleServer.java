@@ -86,32 +86,36 @@ public class SimpleServer extends AbstractServer {
 				// Check for win condition
 				// Check rows
 
-
-
+				boolean isVictory = false;
+					// rows
 					for (int i = 0; i < 3; i++) {
 						if (gameGrid[i * 3] == playerId && gameGrid[i * 3 + 1] == playerId && gameGrid[i * 3 + 2] == playerId) {
-							sendToAllClients("[GAME INFO] VICTORY! " + ((playerId == 1) ? "X" : "O"));
-
+							isVictory=true;
+							break;
 						}
 					}
 
-					// Check columns
+
+					// columns
 					for (int j = 0; j < 3; j++) {
 						if (gameGrid[j] == playerId && gameGrid[j + 3] == playerId && gameGrid[j + 6] == playerId) {
-							sendToAllClients("[GAME INFO] VICTORY! " + ((playerId == 1) ? "X" : "O"));
-
+							isVictory = true;
+							break;
 						}
 					}
 
 					// Check diagonals
-					if (gameGrid[0] == playerId && gameGrid[4] == playerId && gameGrid[8] == playerId) {
-						sendToAllClients("[GAME INFO] VICTORY! " + ((playerId == 1) ? "X" : "O"));
+					if (gameGrid[0] == playerId && gameGrid[4] == playerId && gameGrid[8] == playerId)
+						isVictory = true;
 
-					}
-					if (gameGrid[2] == playerId && gameGrid[4] == playerId && gameGrid[6] == playerId) {
-						sendToAllClients("[GAME INFO] VICTORY! " + ((playerId == 1) ? "X" : "O"));
 
-					}
+					if (gameGrid[2] == playerId && gameGrid[4] == playerId && gameGrid[6] == playerId)
+						isVictory = true;
+
+
+					if(isVictory) sendToAllClients("[GAME INFO] VICTORY! " + ((playerId == 1) ? "X" : "O"));
+
+
 					if(totalFilled == 9){
 						sendToAllClients("[GAME INFO] DRAW!");
 					}
