@@ -29,4 +29,9 @@ public class Warning implements Serializable {
 	public LocalTime getTime() {
 		return time;
 	}
+
+	@Override
+	public String toString() {
+		return message;
+	}
 }
