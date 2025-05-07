@@ -16,7 +16,9 @@ import java.util.concurrent.TimeUnit;
 
 public class PrimaryController {
 	private SimpleClient client;
+	@FXML
 	public Button joinGameBtn;
+	@FXML
 	public Label welcomeLbl;
 	private boolean isWaiting = false;
 	@FXML

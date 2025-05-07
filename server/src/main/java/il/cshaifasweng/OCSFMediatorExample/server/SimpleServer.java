@@ -113,11 +113,11 @@ public class SimpleServer extends AbstractServer {
 						isVictory = true;
 
 
-					if(isVictory) sendToAllClients("[GAME INFO] VICTORY! " + ((playerId == 1) ? "X" : "O"));
+					if(isVictory) sendToAllClients(new GameUpdateEvent("[GAME INFO] VICTORY! " + ((playerId == 1) ? "X" : "O")));
 
 
 					if(totalFilled == 9){
-						sendToAllClients("[GAME INFO] DRAW!");
+						sendToAllClients(new GameUpdateEvent("[GAME INFO] DRAW!"));
 					}
 
 			}
@@ -129,7 +129,6 @@ public class SimpleServer extends AbstractServer {
 
 				sendToAllClients(new PlayerJoinedEvent(true));
 			}
-
 		}
 		else if(msgString.startsWith("#resetGameGrid")){
 			gameGrid = new int[]{0,0,0,0,0,0,0,0,0};

@@ -114,6 +114,7 @@ public class SecondaryController {
     // now if we post anything on the event bus that is of type GameUpdateEvent, this method will be called automatically
     @Subscribe
     public void updateGameGrid(GameUpdateEvent event) { // we get a GameUpdateEvent with the new game grid.
+        if(event.getEventString().contains("#"))
         Platform.runLater(() -> {
         int[] gameGrid = event.getGrid(); // get the new game grid
         for (int i = 0; i < gameGrid.length; i++) {
@@ -127,7 +128,7 @@ public class SecondaryController {
 
     @FXML
     void btnClicked(MouseEvent event) {
-        Platform.runLater(() -> { // I hope it works
+        Platform.runLater(() -> { // I hope it works ( it does :) )
         Node src = (Node) event.getSource(); // source of the event (who caused it)
         int btnIndex = Integer.parseInt(src.getId().charAt(3)+"");// the index of the button (btn0, btn1, ... btn8)
 
@@ -164,7 +165,7 @@ public class SecondaryController {
             stage.setWidth(500);
             stage.setHeight(600);
             stage.setResizable(false);
-            stage.setTitle("Tic-Tac-Toe!");
+            stage.setTitle("Tic-Tac-Toe! | Match Started");
         });
     }
 

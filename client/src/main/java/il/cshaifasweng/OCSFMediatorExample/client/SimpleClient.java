@@ -34,7 +34,7 @@ public class SimpleClient extends AbstractClient {
 					}
 
 				}else {
-					GameUpdateEvent event = (GameUpdateEvent) msg;
+					GameUpdateEvent event = (GameUpdateEvent) msg; // safe downcast
 					EventBus.getDefault().post(event); // after we updated in the server, we update locally (for each client)
 				}
 			}
