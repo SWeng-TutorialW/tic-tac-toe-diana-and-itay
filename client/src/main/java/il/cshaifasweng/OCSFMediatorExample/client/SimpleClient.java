@@ -21,20 +21,24 @@ public class SimpleClient extends AbstractClient {
 		}
 		else if(msg.toString().contains("#myTurn")){myTurn = true;}
 		else if (msg.getClass().equals(GameUpdateEvent.class)) { //
-				if(msg.toString().contains("[GAME INFO] VICTORY!")){ // msg would be "[GAME INFO] VICTORY! X/O" - last char is the winner
-					String winner = msg.toString().substring(msg.toString().length()-1);
+			GameUpdateEvent event = (GameUpdateEvent) msg; // safe downcast
+				if(event.getEventString().contains("#victory")){ // msg would be "#victory X/O" - last char is the winner
+
+					String winner = (event.getEventString().substring(event.getEventString().length()-1));
 					if(winner.equals("X")){
-						EventBus.getDefault().post("#winner X");
+						EventBus.getDefault().post(new GameUpdateEvent("#winner X"));
 					}
 					else if(winner.equals("O")){
-						EventBus.getDefault().post("#winner O");
+						EventBus.getDefault().post(new GameUpdateEvent("#winner O"));
 					}
 					else{
 						throw new NumberFormatException();
 					}
 
-				}else {
-					GameUpdateEvent event = (GameUpdateEvent) msg; // safe downcast
+				}else if (event.getEventString().contains("#draw")){
+					EventBus.getDefault().post(new GameUpdateEvent("#draw"));
+				}
+				else {
 					EventBus.getDefault().post(event); // after we updated in the server, we update locally (for each client)
 				}
 			}
@@ -83,6 +87,9 @@ public class SimpleClient extends AbstractClient {
 			client = new SimpleClient(host, port);
 		}
 		return client;
+	}
+	public static void removeClient(){ // remove locally ***
+		client = null;
 	}
 
 

@@ -20,7 +20,7 @@ import org.greenrobot.eventbus.Subscribe;
 public class App extends Application {
 
     private static Scene scene;
-    private SimpleClient client;
+
     private Stage stage;
     @Override
     public void start(Stage stage) throws IOException {
@@ -36,11 +36,11 @@ public class App extends Application {
 
 
     }
-    @Subscribe
+
+ /*   @Subscribe
     public void onResult(GameUpdateEvent event) {
         	Platform.runLater(() -> {
                 try {
-
 
                     if(event.getEventString().contains("DRAW"))
                     {
@@ -53,6 +53,7 @@ public class App extends Application {
 
                         Thread.sleep(5000);
                         stage.setScene(scene);
+                        EventBus.getDefault().unregister(this);
                     }
                     else if(event.getEventString().contains("VICTORY")){
                         String winner = event.getEventString().substring(event.getEventString().length()-1);
@@ -73,7 +74,7 @@ public class App extends Application {
                         client.closeConnection();
                         Thread.sleep(5000);
                         stage.setScene(scene);
-
+                        EventBus.getDefault().unregister(this);
                     }
 
 
@@ -81,7 +82,7 @@ public class App extends Application {
             catch (Exception e) {
                 e.printStackTrace();
             }});
-    }
+    }*/
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
@@ -91,16 +92,16 @@ public class App extends Application {
         return fxmlLoader.load();
     }
     
-    void setClient(SimpleClient client) {
-    	this.client = client;
-    }
+
 
     @Override
 	public void stop() throws Exception {
 		// TODO Auto-generated method stub
+
     	EventBus.getDefault().unregister(this);
-        client.sendToServer("#removeClient");
-        client.closeConnection();
+
+        SimpleClient.getClient().sendToServer("#removeClient");
+        SimpleClient.getClient().closeConnection();
 		super.stop();
 	}
     

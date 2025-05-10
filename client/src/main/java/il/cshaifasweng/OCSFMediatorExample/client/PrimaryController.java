@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class PrimaryController {
-	private SimpleClient client;
+	private SimpleClient client=null;
 	@FXML
 	public Button joinGameBtn;
 	@FXML
@@ -28,22 +28,24 @@ public class PrimaryController {
 
 	@FXML
 	void switchToGame(ActionEvent event) throws Exception {
-		String gameAddress = gameAddTxtBox.getText();
+		String gameAddress = gameAddTxtBox.getText(); // ip
 		client = SimpleClient.createClient(gameAddress, Integer.parseInt(portTxtBox.getText()));
 		try{
 			client.openConnection();
-			if(!client.isConnected())
-				throw new IOException("Could not connect to server");
-			client.sendToServer("add client");
-			Thread.sleep(300); // wait for the server to add the client
+			if(!client.isConnected()){
+				throw new IOException("Could not connect to server");}
+			client.sendToServer("add client"); // the client is going to be one of the subscribers of SimpleServer
+			Thread.sleep(100); // wait for the server to add the client
 			isWaiting = true;
 			client.sendToServer("#joined");
 			joinGameBtn.setDisable(true);
 			welcomeLbl.setText("Waiting for other player to join...");
-			client.sendToServer(new WarningEvent(new Warning("Im waiting!!!!")));
+
 
 		}catch(Exception e){
 			welcomeLbl.setText(e.toString());
+			SimpleClient.removeClient();
+			client=null;
 		}
 	}
 
@@ -52,9 +54,9 @@ public class PrimaryController {
 		Platform.runLater(() -> {
 			if (event.getHasJoined() && isWaiting) { // if we are waiting and the other player joined, start the game
 			try {
+				EventBus.getDefault().unregister(this);
 				App.setRoot("secondary");
 
-				EventBus.getDefault().unregister(this);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

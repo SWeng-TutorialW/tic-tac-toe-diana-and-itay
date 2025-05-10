@@ -77,6 +77,11 @@ public class SimpleServer extends AbstractServer {
 					throw new NumberFormatException(); // shouldn't happen
 
 				}
+				String gridString = "";
+                for (int k : gameGrid) {
+                    gridString += k + " ";
+                }
+				System.out.println("Grid: {"+gridString+"}"); // for debugging
 				int oppositePlayer = (playerId == 1) ? 2 : 1; // opposite player
 				SubscribersList.get(oppositePlayer - 1).getClient().sendToClient("#myTurn");
 				sendToAllClients(new GameUpdateEvent("Placed an " + playerChar + " on " + placedOn, gameGrid)); // everyone updates their grid
@@ -86,12 +91,12 @@ public class SimpleServer extends AbstractServer {
 				// Check for win condition
 				// Check rows
 
-				boolean isVictory = false;
+
 					// rows
 					for (int i = 0; i < 3; i++) {
 						if (gameGrid[i * 3] == playerId && gameGrid[i * 3 + 1] == playerId && gameGrid[i * 3 + 2] == playerId) {
-							isVictory=true;
-							break;
+							sendToAllClients(new GameUpdateEvent("#victory " + ((playerId == 1) ? "X" : "O"))); return;
+
 						}
 					}
 
@@ -99,25 +104,19 @@ public class SimpleServer extends AbstractServer {
 					// columns
 					for (int j = 0; j < 3; j++) {
 						if (gameGrid[j] == playerId && gameGrid[j + 3] == playerId && gameGrid[j + 6] == playerId) {
-							isVictory = true;
-							break;
+							sendToAllClients(new GameUpdateEvent("#victory " + ((playerId == 1) ? "X" : "O"))); return;
+
 						}
 					}
 
 					// Check diagonals
-					if (gameGrid[0] == playerId && gameGrid[4] == playerId && gameGrid[8] == playerId)
-						isVictory = true;
-
-
-					if (gameGrid[2] == playerId && gameGrid[4] == playerId && gameGrid[6] == playerId)
-						isVictory = true;
-
-
-					if(isVictory) sendToAllClients(new GameUpdateEvent("[GAME INFO] VICTORY! " + ((playerId == 1) ? "X" : "O")));
+					if ((gameGrid[0] == playerId && gameGrid[4] == playerId && gameGrid[8] == playerId)
+					|| gameGrid[2] == playerId && gameGrid[4] == playerId && gameGrid[6] == playerId){
+						sendToAllClients(new GameUpdateEvent("#victory " + ((playerId == 1) ? "X" : "O"))); return;}
 
 
 					if(totalFilled == 9){
-						sendToAllClients(new GameUpdateEvent("[GAME INFO] DRAW!"));
+						sendToAllClients(new GameUpdateEvent("#draw"));
 					}
 
 			}
@@ -139,12 +138,14 @@ public class SimpleServer extends AbstractServer {
 			if(!SubscribersList.isEmpty()){
 				for(SubscribedClient subscribedClient: SubscribersList){
 					if(subscribedClient.getClient().equals(client)){
+						String clientIp = client.getInetAddress().getHostAddress();
 						SubscribersList.remove(subscribedClient);
-						System.out.println("Client removed: " + client.getInetAddress().getHostAddress());
+						System.out.println("Client removed: " + clientIp);
 						break;
 					}
 				}
 			}
+			if(SubscribersList.isEmpty()) {gameGrid = new int[]{0,0,0,0,0,0,0,0,0}; totalFilled=0;}
 		}
 
 	}

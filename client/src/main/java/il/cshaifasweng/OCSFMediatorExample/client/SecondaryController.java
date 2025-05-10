@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import javafx.scene.control.Alert;
 import javafx.scene.text.Font;
 import javafx.scene.input.MouseEvent;
 import java.io.IOException;
@@ -78,53 +79,90 @@ public class SecondaryController {
     }
 
     @Subscribe
-    public void winnerWinnerChickenDinner(String winner) {
-        Platform.runLater(() -> {
-            if (winner.equals("#winner X")) {
-                playLbl.setText("Player X wins!");
-                playLbl.setFont(Font.font("System", 22));
-                try{SimpleClient.getClient().closeConnection();}
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            } else if (winner.equals("#winner O")) {
-                playLbl.setText("Player O wins!");
-                playLbl.setFont(Font.font("System", 22));
-                try{SimpleClient.getClient().closeConnection();}
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else if(winner.equals("[GAME INFO] DRAW!")) {
-                playLbl.setText("It's a draw!");
-                playLbl.setFont(Font.font("System", 22));
-            }
+    public void winnerWinnerChickenDinner(GameUpdateEvent event) { // we get a GameUpdateEvent with the new game grid.
+        if((event.getEventString().equals("#draw") || event.getEventString().equals("#winner X") || event.getEventString().equals("#winner O")))
+            Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Game Over");
             for (ImageView btn : btns) {
                 btn.setDisable(true); // disable all buttons because someone won
             }
-        });
+
+            switch (event.getEventString()) {
+                case "#winner X" -> {
+                    try {
+                        SimpleClient.getClient().sendToServer("#removeClient");
+                        SimpleClient.getClient().closeConnection();
+                        SimpleClient.removeClient();
+                        EventBus.getDefault().unregister(this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+                    alert.setHeaderText(SimpleClient.getClient().getId() == 1 ? "YOU WIN! \n Let's go!" : "YOU LOST! \n Better Luck Next Time.");
+                    alert.show();
+                }
+                case "#winner O" -> {
+                    try {
+                        SimpleClient.getClient().sendToServer("#removeClient");
+                        SimpleClient.getClient().closeConnection();
+                        SimpleClient.removeClient();
+                        EventBus.getDefault().unregister(this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+                    alert.setHeaderText(SimpleClient.getClient().getId() == 2 ? "YOU WIN! \n Let's go!" : "YOU LOST! \n Better Luck Next Time.");
+                    alert.show();
+                }
+                case "#draw" -> {
+                    try {
+                        SimpleClient.getClient().sendToServer("#removeClient");
+                        SimpleClient.getClient().closeConnection();
+                        SimpleClient.removeClient();
+                        EventBus.getDefault().unregister(this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+
+                    alert.setHeaderText("DRAW! \n Annoying, isn't it?");
+                    alert.show();
+                }
+            }
+
+                try {
+                    switchToPrimary(); // and then return to main page (and start the whole game again)
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
 
     @FXML
     private void switchToPrimary() throws IOException {
         App.setRoot("primary");
-
     }
 
     // now if we post anything on the event bus that is of type GameUpdateEvent, this method will be called automatically
     @Subscribe
     public void updateGameGrid(GameUpdateEvent event) { // we get a GameUpdateEvent with the new game grid.
-        if(event.getEventString().contains("#"))
+
         Platform.runLater(() -> {
-        int[] gameGrid = event.getGrid(); // get the new game grid
-        for (int i = 0; i < gameGrid.length; i++) {
-            if (gameGrid[i] == 1) { // if the button is clicked by player 1
-                btns[i].setImage(getPlayerImage(1)); // set X
-            } else if (gameGrid[i] == 2) { // if the button is clicked by player 2
-                btns[i].setImage(getPlayerImage(2)); // set O
+            int[] gameGrid = event.getGrid(); // get the new game grid
+            for (int i = 0; i < gameGrid.length; i++) {
+                if (gameGrid[i] == 1) { // if the button is clicked by player 1
+                    btns[i].setImage(getPlayerImage(1)); // set X
+                } else if (gameGrid[i] == 2) { // if the button is clicked by player 2
+                    btns[i].setImage(getPlayerImage(2)); // set O
+                }
             }
-        }});
+        });
     }
+
+
 
     @FXML
     void btnClicked(MouseEvent event) {
@@ -147,7 +185,7 @@ public class SecondaryController {
             }
         }
         else{
-            System.out.println("This button is already clicked");
+            System.out.println("This button is already clicked/occupied");
         }});
 
     }
@@ -163,7 +201,7 @@ public class SecondaryController {
         Platform.runLater(() -> {
             Stage stage = (Stage) btn0.getScene().getWindow(); // choose a random button and get its source
             stage.setWidth(500);
-            stage.setHeight(600);
+            stage.setHeight(650);
             stage.setResizable(false);
             stage.setTitle("Tic-Tac-Toe! | Match Started");
         });
