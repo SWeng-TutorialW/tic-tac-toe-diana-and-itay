@@ -20,18 +20,69 @@ import org.greenrobot.eventbus.Subscribe;
 public class App extends Application {
 
     private static Scene scene;
-    private SimpleClient client;
 
+    private Stage stage;
     @Override
     public void start(Stage stage) throws IOException {
+
     	EventBus.getDefault().register(this);
-    	client = SimpleClient.getClient();
-    	client.openConnection();
-        scene = new Scene(loadFXML("primary"), 640, 480);
+
+        scene = new Scene(loadFXML("primary"), 450, 380);
+        this.stage = stage;
         stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setTitle("Tic-Tac-Toe!");
         stage.show();
+
+
     }
 
+ /*   @Subscribe
+    public void onResult(GameUpdateEvent event) {
+        	Platform.runLater(() -> {
+                try {
+
+                    if(event.getEventString().contains("DRAW"))
+                    {
+                        Alert alert = new Alert(AlertType.INFORMATION, "It's a draw!");
+                        alert.setTitle("Game Over");
+                        alert.show();
+
+                        client.sendToServer("#removeClient");
+                        client.closeConnection();
+
+                        Thread.sleep(5000);
+                        stage.setScene(scene);
+                        EventBus.getDefault().unregister(this);
+                    }
+                    else if(event.getEventString().contains("VICTORY")){
+                        String winner = event.getEventString().substring(event.getEventString().length()-1);
+                        String alertStr="";
+                        if(winner.equals("X") && client.getId() == 1){
+                            alertStr = "You win!";
+                        }
+                        else if(winner.equals("O") && client.getId() == 2){
+                            alertStr = "You win!";
+                        }
+                        else{
+                            alertStr = "YOU LOST!";
+                        }
+                        Alert alert = new Alert(AlertType.INFORMATION, alertStr);
+                        alert.setTitle("Game Over");
+                        alert.show();
+                        client.sendToServer("#removeClient");
+                        client.closeConnection();
+                        Thread.sleep(5000);
+                        stage.setScene(scene);
+                        EventBus.getDefault().unregister(this);
+                    }
+
+
+                }
+            catch (Exception e) {
+                e.printStackTrace();
+            }});
+    }*/
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
@@ -41,14 +92,16 @@ public class App extends Application {
         return fxmlLoader.load();
     }
     
-    
+
 
     @Override
 	public void stop() throws Exception {
 		// TODO Auto-generated method stub
+
     	EventBus.getDefault().unregister(this);
-        client.sendToServer("remove client");
-        client.closeConnection();
+
+        SimpleClient.getClient().sendToServer("#removeClient");
+        SimpleClient.getClient().closeConnection();
 		super.stop();
 	}
     
